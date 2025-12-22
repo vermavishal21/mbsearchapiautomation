@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testng-results ignored="0" total="4" passed="4" failed="0" skipped="0">
+  <reporter-output>
+  </reporter-output>
+  <suite started-at="2025-12-22T12:55:26 IST" name="Default suite" finished-at="2025-12-22T12:55:48 IST" duration-ms="22116">
+    <groups>
+    </groups>
+    <test started-at="2025-12-22T12:55:26 IST" name="Default test" finished-at="2025-12-22T12:55:48 IST" duration-ms="22116">
+      <class name="tests.test">
+        <test-method is-config="true" signature="setup()[pri:0, instance:tests.test@397fbdb]" started-at="2025-12-22T12:55:26 IST" name="setup" finished-at="2025-12-22T12:55:27 IST" duration-ms="358" status="PASS">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- setup -->
+        <test-method signature="validateSearchAPIStatus()[pri:1, instance:tests.test@397fbdb]" started-at="2025-12-22T12:55:27 IST" name="validateSearchAPIStatus" finished-at="2025-12-22T12:55:31 IST" duration-ms="4818" status="PASS">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- validateSearchAPIStatus -->
+        <test-method signature="validateMandatoryFields()[pri:2, instance:tests.test@397fbdb]" started-at="2025-12-22T12:55:31 IST" name="validateMandatoryFields" finished-at="2025-12-22T12:55:37 IST" duration-ms="5133" status="PASS">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- validateMandatoryFields -->
+        <test-method signature="validatePriceCalculation()[pri:3, instance:tests.test@397fbdb]" started-at="2025-12-22T12:55:37 IST" name="validatePriceCalculation" finished-at="2025-12-22T12:55:41 IST" duration-ms="4818" status="PASS">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- validatePriceCalculation -->
+        <test-method signature="validatePriceFormatted()[pri:4, instance:tests.test@397fbdb]" started-at="2025-12-22T12:55:41 IST" name="validatePriceFormatted" finished-at="2025-12-22T12:55:48 IST" duration-ms="6940" status="PASS">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- validatePriceFormatted -->
+      </class> <!-- tests.test -->
+    </test> <!-- Default test -->
+  </suite> <!-- Default suite -->
+</testng-results>
