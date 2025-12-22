@@ -7,8 +7,8 @@ public class Base {
 
     @BeforeClass
     public void setup() {
-    	RestAssured.baseURI = "https://www.magicbricks.com";
-        RestAssured.proxy = null;  // IMPORTANT
-        RestAssured.basePath = "/mbsrp/propertySearch.html";
+        RestAssured.baseURI = "https://www.magicbricks.com";
+        RestAssured.basePath = ""; // IMPORTANT
+        RestAssured.proxy = null;
     }
 }

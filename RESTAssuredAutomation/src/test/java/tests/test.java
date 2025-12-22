@@ -1,64 +1,26 @@
 package tests;
 
+import Pages.search;
 import Setup.Base;
 import io.restassured.response.Response;
-
+import org.testng.Assert;
 import org.testng.annotations.Test;
-import Pages.search;
 
+import java.util.List;
 
 public class test extends Base {
-	
-	Object driver = null;
-	private search src;
-	
-//=============================================//	
-//	@Test
-//	public void apiresponse() {
-//		src = new search(driver);
-//		src.apiresponse();
-//	}
 
-//=============================================//
-	
-	
-	
-	
-	//Test Case : to verify API is Working or not
-    @Test(priority = 1)
-    public void validatePropertySearchAPIStatus() {
-		src = new search(driver);
-		src.verifyPropertySearchAPIStatus();
+    @Test
+    public void validateSearchFromExcel() {
+
+        search src = new search();
+        List<Response> responses = src.getResponsesFromExcel();
+
+        Assert.assertTrue(responses.size() > 0,
+                "❌ No Excel rows found with Run = Y");
+
+        for (Response response : responses) {
+            response.then().statusCode(200);
+        }
     }
-    
-	//Test Case: Validate Mandatory Fields Exist
-    @Test(priority = 2)
-    public void validateMandatoryFieldsValidation() {
-        src = new search(driver);
-        Response response = src.getPropertySearchAPIResponse();
-        response.then().statusCode(200);
-        src.validateMandatoryFields(response);
-    }
-    
-	//Test Case : Validate Price Range
-    @Test(priority = 3)
-   public void validatePriceCalculationTest() {
-    	  src = new search(driver);
-          Response response = src.getPropertySearchAPIResponse();
-          response.then().statusCode(200);
-          src.validatePriceRange(response);
-    }
-          
-    //Test Case: Validate Formatted Price 
-    @Test(priority = 4)
-    public void validatepriceformatted() {
-    	src = new search (driver);
-    	Response response = src.getPropertySearchAPIResponse();
-    	response.then().statusCode(200);
-    	src.validatePriceFormatted(response);
-    	
-    }
-    
-    
-    
 }
