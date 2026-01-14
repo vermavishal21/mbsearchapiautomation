@@ -67,34 +67,32 @@ public class search {
 
         List<String> ids =
                 response.jsonPath().getList("resultList.id");
-
+        System.out.println("===============================");
+        System.out.println("Test Case 1: Verify API Status");
         System.out.println("===== PROPERTY IDS =====");
-        
-
 //        for (String id : ids) {
 //            System.out.println("ID : " + id);
 //        }
 //
 //        System.out.println("Total IDs : " + ids.size());
 //        System.out.println("========================");
-        
-        
         if (ids == null || ids.isEmpty()) {
+        	System.out.println("Status Code : " + response.getStatusCode());
             System.out.println("No property IDs found");
             System.out.println("Total Property Count : 0");
             System.out.println("========================");
+            System.out.println("\n\n");
             return;
         }
-
         // ✅ Print IDs
 //        for (String id : ids) {
 //            System.out.println("ID : " + id);
 //        }
-
         // ✅ Record count
         System.out.println("========================");
         System.out.println("Total Property Count : " + ids.size());
         System.out.println("========================");
+        System.out.println("\n\n");
         
         
         
@@ -114,8 +112,9 @@ public class search {
                 "url", "postDateT", "endDateT",
                 "priceD", "price"
         };
-
-        System.out.println("\n========= VALIDATING MANDATORY FIELDS =========\n");
+        System.out.println("==================================================");
+        System.out.println("Test Case 2: Verify Mandatory Field Exist");
+        System.out.println("========= VALIDATING MANDATORY FIELDS =========");
 
         for (int i = 0; i < list.size(); i++) {
 
@@ -161,7 +160,7 @@ public class search {
         System.out.println("Total Records Checked : " + list.size());
         System.out.println("Passed Properties     : " + passCount);
         System.out.println("Failed Properties     : " + failCount);
-        System.out.println("==================================");
+        System.out.println("==================================\n\n");
 
         Assert.assertEquals(
                 failCount,
@@ -175,10 +174,12 @@ public class search {
     public void validatePriceRange() {
 
         List<Map<String, Object>> properties = getResultList();
-
+        int totalCount   = properties.size();
         int failCount = 0;
         int skippedCount = 0;
-
+        int passCount = 0;
+        System.out.println("==================================================");
+        System.out.println("Test Case 3: Verify Price Range");
         System.out.println("========== VALIDATION PRICE RANGE ==========");
 
         for (Map<String, Object> item : properties) {
@@ -202,19 +203,19 @@ public class search {
 
             if (skipValidation) {
                 skippedCount++;
-                System.out.println("SKIPPED (Safety Rule Applied)");
+                System.out.println("\n\nSKIPPED (Safety Rule Applied)");
                 System.out.println("ID  : " + id);
                 System.out.println("URL : " + url);
-                System.out.println("----------------------------------");
+                System.out.println("----------------------------------\n\n");
                 continue;
             }
 
             if (sqFtPrice == null || caSqFt == null || price == null) {
                 failCount++;
-                System.out.println("FAIL – Missing Price Fields");
+                System.out.println("\n\n FAIL – Missing Price Fields");
                 System.out.println("ID  : " + id);
                 System.out.println("URL : " + url);
-                System.out.println("----------------------------------");
+                System.out.println("----------------------------------\n\n");
                 continue;
             }
 
@@ -230,20 +231,29 @@ public class search {
 
                 failCount++;
 
-                System.out.println("❌ PRICE OUT OF RANGE");
+                System.out.println("\n\n❌ PRICE OUT OF RANGE");
                 System.out.println("ID            : " + id);
                 System.out.println("URL           : " + url);
                 System.out.println("Calculated    : " + calculatedPrice);
                 System.out.println("Allowed Range : " + lowerLimit + " - " + upperLimit);
                 System.out.println("Actual Price  : " + actualPrice);
-                System.out.println("----------------------------------");
+                System.out.println("----------------------------------\n\n");
             }
+            
+            else {
+                // ✅ PASS
+                passCount++;
+            }
+            
+            
         }
 
         System.out.println("============================================");
+        System.out.println("Total Records   : " + totalCount);
+        System.out.println("Passed Records  : " + passCount);
         System.out.println("Skipped Records : " + skippedCount);
         System.out.println("Failed Records  : " + failCount);
-        System.out.println("============================================");
+        System.out.println("============================================\n\n");
 
         Assert.assertEquals(
                 failCount,
@@ -261,10 +271,14 @@ public class search {
 
         List<String> priceDList =
                 response.jsonPath().getList("resultList.priceD");
-
+        int totalCount   = priceList.size();
         int failCount = 0;
         int skippedCount = 0;
-
+        int passCount = 0;
+        
+        System.out.println("==================================================");
+        System.out.println("Test Case 4: Verify Price Formatted");
+        
         System.out.println("========== VALIDATION FORMATTED PRICE ==========");
 
         for (int i = 0; i < priceList.size(); i++) {
@@ -289,12 +303,20 @@ public class search {
                         " | Converted: " + priceDValue
                 );
             }
+            
+            else {
+                // ✅ PASS
+                passCount++;
+            }
+            
         }
 
         System.out.println("============================================");
+        System.out.println("Total Records   : " + totalCount);
+        System.out.println("Passed Records  : " + passCount);
         System.out.println("Failed Records  : " + failCount);
         System.out.println("Skipped Records : " + skippedCount);
-        System.out.println("============================================");
+        System.out.println("============================================\n\n");
 
         Assert.assertEquals(
                 failCount,
