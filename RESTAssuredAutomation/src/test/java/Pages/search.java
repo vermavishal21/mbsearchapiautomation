@@ -57,6 +57,8 @@ public class search {
 
         return resultList;
     }
+    
+    
 
     /* ================= EXTRA FUNCTIONALITY (2nd CLASS) ================= */
 
@@ -67,13 +69,35 @@ public class search {
                 response.jsonPath().getList("resultList.id");
 
         System.out.println("===== PROPERTY IDS =====");
+        
 
-        for (String id : ids) {
-            System.out.println("ID : " + id);
+//        for (String id : ids) {
+//            System.out.println("ID : " + id);
+//        }
+//
+//        System.out.println("Total IDs : " + ids.size());
+//        System.out.println("========================");
+        
+        
+        if (ids == null || ids.isEmpty()) {
+            System.out.println("No property IDs found");
+            System.out.println("Total Property Count : 0");
+            System.out.println("========================");
+            return;
         }
 
-        System.out.println("Total IDs : " + ids.size());
+        // ✅ Print IDs
+//        for (String id : ids) {
+//            System.out.println("ID : " + id);
+//        }
+
+        // ✅ Record count
         System.out.println("========================");
+        System.out.println("Total Property Count : " + ids.size());
+        System.out.println("========================");
+        
+        
+        
     }
 
     /* ================= VALIDATION : MANDATORY FIELDS ================= */
@@ -121,15 +145,15 @@ public class search {
 
             }
             // ✅ PASS CASE
-            else {
-
+//            else {
+//
                 passCount++;
-
-                System.out.println("✅ Property PASSED");
-                System.out.println("ID : " + item.get("id"));
-                System.out.println("All mandatory fields are available");
-                System.out.println("--------------------------------------------");
-            }
+//
+//                System.out.println("✅ Property PASSED");
+//                System.out.println("ID : " + item.get("id"));
+//                System.out.println("All mandatory fields are available");
+//                System.out.println("--------------------------------------------");
+//            }
         }
 
         // 📊 FINAL SUMMARY
