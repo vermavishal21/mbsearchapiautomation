@@ -9,25 +9,19 @@ import static io.restassured.RestAssured.given;
 
 public class APIUtils {
 
-    public static Response get(String url, Map<String, Object> params) {
-
+	public static Response get(String path, Map<String, ?> params) {
         return given()
-                .header("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64)")
-                .header("Accept", "application/json, text/plain, */*")
-                .cookie("lang", "en")
-                .cookie("mbVisitorId", "1234567890")
-                .cookie("authId", "xyz123")
+                .log().all()
                 .queryParams(params)
-                .contentType(ContentType.HTML)// important
-                .when()
-                .get(url)
+             .when()
+                .get("/mbsrp/propertySearch.html")
                 .then()
                 .extract()
                 .response();
     }
 }
 
-
+ 
 
 //package Utils;
 //

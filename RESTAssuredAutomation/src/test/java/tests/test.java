@@ -1,64 +1,64 @@
 package tests;
 
-import Setup.Base;
-import io.restassured.response.Response;
+import java.util.Map;
 
 import org.testng.annotations.Test;
-import Pages.search;
 
+import Pages.search;
+import Setup.Base;
+import DataProvider.SearchDataProvider;
 
 public class test extends Base {
-	
-	Object driver = null;
-	private search src;
-	
-//=============================================//	
-//	@Test
-//	public void apiresponse() {
-//		src = new search(driver);
-//		src.apiresponse();
-//	}
 
-//=============================================//
-	
-	
-	
-	
-	//Test Case : to verify API is Working or not
-    @Test(priority = 1)
-    public void validatePropertySearchAPIStatus() {
-		src = new search(driver);
-		src.verifyPropertySearchAPIStatus();
+    @Test(
+        priority = 1,
+        dataProvider = "searchPayloadData",
+        dataProviderClass = SearchDataProvider.class
+    )
+    public void printPropertyIds(Map<String, String> excelData) {
+
+        search src = new search(null);
+        src.getPropertySearchAPIResponse(excelData);
+
+        src.printAllPropertyIds();
     }
-    
-	//Test Case: Validate Mandatory Fields Exist
-    @Test(priority = 2)
-    public void validateMandatoryFieldsValidation() {
-        src = new search(driver);
-        Response response = src.getPropertySearchAPIResponse();
-        response.then().statusCode(200);
-        src.validateMandatoryFields(response);
+
+    @Test(
+        priority = 2,
+        dataProvider = "searchPayloadData",
+        dataProviderClass = SearchDataProvider.class
+    )
+    public void validateMandatoryFields(Map<String, String> excelData) {
+
+        search src = new search(null);
+        src.getPropertySearchAPIResponse(excelData);
+
+        src.validateMandatoryFields();
     }
-    
-	//Test Case : Validate Price Range
-    @Test(priority = 3)
-   public void validatePriceCalculationTest() {
-    	  src = new search(driver);
-          Response response = src.getPropertySearchAPIResponse();
-          response.then().statusCode(200);
-          src.validatePriceRange(response);
+
+    @Test(
+        priority = 3,
+        dataProvider = "searchPayloadData",
+        dataProviderClass = SearchDataProvider.class
+    )
+    public void validatePriceRange(Map<String, String> excelData) {
+
+        search src = new search(null);
+        src.getPropertySearchAPIResponse(excelData);
+
+        src.validatePriceRange();
     }
-          
-    //Test Case: Validate Formatted Price 
-    @Test(priority = 4)
-    public void validatepriceformatted() {
-    	src = new search (driver);
-    	Response response = src.getPropertySearchAPIResponse();
-    	response.then().statusCode(200);
-    	src.validatePriceFormatted(response);
-    	
+
+    @Test(
+        priority = 4,
+        dataProvider = "searchPayloadData",
+        dataProviderClass = SearchDataProvider.class
+    )
+    public void validateFormattedPrice(Map<String, String> excelData) {
+
+        search src = new search(null);
+        src.getPropertySearchAPIResponse(excelData);
+
+        src.validatePriceFormatted();
     }
-    
-    
-    
 }

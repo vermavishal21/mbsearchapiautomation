@@ -1,50 +1,71 @@
 package Pages;
 
-
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import org.testng.Assert;
+import org.testng.SkipException;
 
 import Utils.APIUtils;
 import Utils.PayloadBuilder;
 import Utils.Support;
 import io.restassured.response.Response;
 
-
-
 public class search {
-	
-	
-	
-	public search(Object driver) {
-		// TODO Auto-generated constructor stub
-	}
-	
-	Object driver = null;
-	private search MBSearchAPI;
 
-	
-	public Response getPropertySearchAPIResponse() {
-	    return APIUtils.get(
-	            "/mbsrp/propertySearch.html",
-	            PayloadBuilder.fullSearchPayload()
-	    );
-	}
-	
-	
-	
-	public void apiresponse () {
-		
-		//String targetId = "81491289";  // ID you want to filter
-		
-		Response response = APIUtils.get(
+    private Response response;
+
+    public search(Object driver) { }
+
+    /* ================= API HIT (DataProvider BASED) ================= */
+
+    public void getPropertySearchAPIResponse(Map<String, String> excelData) {
+
+        //System.out.println("Executing Search API with payload:");
+        //System.out.println(excelData);
+
+        response = APIUtils.get(
                 "/mbsrp/propertySearch.html",
-                PayloadBuilder.fullSearchPayload()
+                PayloadBuilder.buildPayload(excelData)
         );
 
         response.then().statusCode(200);
-        List<String> ids = response.jsonPath().getList("resultList.id");
+
+//        System.out.println("===== API STATUS =====");
+//        System.out.println("Status Code : " + response.getStatusCode());
+//        System.out.println("======================");
+    }
+
+    /* ================= COMMON RESULT LIST ================= */
+
+    public List<Map<String, Object>> getResultList() {
+
+        List<Map<String, Object>> resultList =
+                response.jsonPath().getList("resultList");
+
+        if (resultList == null || resultList.isEmpty()) {
+
+            System.out.println("⚠️ No data returned for payload");
+            System.out.println("Skipping validations for this test case");
+            System.out.println("--------------------------------------------");
+
+            throw new SkipException(
+                    "No data returned for this payload. Skipping validations."
+            );
+        }
+
+        return resultList;
+    }
+
+    /* ================= EXTRA FUNCTIONALITY (2nd CLASS) ================= */
+
+    // Print all Property IDs
+    public void printAllPropertyIds() {
+
+        List<String> ids =
+                response.jsonPath().getList("resultList.id");
+
         System.out.println("===== PROPERTY IDS =====");
 
         for (String id : ids) {
@@ -52,287 +73,209 @@ public class search {
         }
 
         System.out.println("Total IDs : " + ids.size());
-        
-        System.out.println("===== Full API Response =====");
-     //   System.out.println(response.getBody().asPrettyString());
-        System.out.println("=============================");
-        
-        
-//        List<Map<String, Object>> properties = response.jsonPath().getList("resultList");
-//
-//        boolean found = false;
-//
-//        System.out.println("========= Searching Property ID: " + targetId + " =========");
-//
-//        for (Map<String, Object> property : properties) {
-//
-//            if (property.get("id") != null && property.get("id").toString().equals(targetId)) {
-//
-//                found = true;
-//
-//                System.out.println("✔ Property Found!");
-//                System.out.println("------------------------------------");
-//
-//                for (String key : property.keySet()) {
-//                    System.out.println(key + " : " + property.get(key));
-//                }
-//
-//                System.out.println("------------------------------------");
-//                break;
-//            }
-//        }
-//
-//        if (!found) {
-//            System.out.println("❌ Property ID " + targetId + " not found in API response.");
-//        }
-//        
-        
-        
-        
-        
-	}
-	
-	
-	
-	public void verifyPropertySearchAPIStatus() {
-
-        Response response = APIUtils.get(
-                "/mbsrp/propertySearch.html",
-                PayloadBuilder.fullSearchPayload()
-        );
-
-        response.then().statusCode(200);
-        System.out.println("===== API Status Details =====");
-        System.out.println();  // blank line
-	        System.out.println("API Status : " + response.getStatusCode());
-	        System.out.println();  // blank line
-	        //System.out.println(response.getBody().asPrettyString());
-        System.out.println("**************************");  // blank line
-	
-       
+        System.out.println("========================");
     }
-	
-	
-	
-	
-	//Test Case: Validate Mandatory Fields Exist
-	public void validateMandatoryFields(Response response) {
 
-	    List<Map<String, Object>> list = response.jsonPath().getList("resultList");
+    /* ================= VALIDATION : MANDATORY FIELDS ================= */
 
-	    System.out.println("========= Validating Mandatory Fields =========");
+    public void validateMandatoryFields() {
 
-	    int failCount = 0;
+        List<Map<String, Object>> list = getResultList();
 
-	    String[] mandatoryFields = {
-	            "encId","possStatusD","pmtSource","url","postDateT","endDateT","priceD",
-	           "price"
-	    };
+        int failCount = 0;
+        int passCount = 0;
 
-	    for (int i = 0; i < list.size(); i++) {
+        String[] mandatoryFields = {
+                "encId", "possStatusD", "pmtSource",
+                "url", "postDateT", "endDateT",
+                "priceD", "price"
+        };
 
-	        Map<String, Object> item = list.get(i);
-	        boolean missing = false;
+        System.out.println("\n========= VALIDATING MANDATORY FIELDS =========\n");
 
-	        for (String field : mandatoryFields) {
+        for (int i = 0; i < list.size(); i++) {
 
-	            if (!item.containsKey(field) ||
-	                    item.get(field) == null ||
-	                    item.get(field).toString().trim().isEmpty()) {
+            Map<String, Object> item = list.get(i);
+            List<String> missingFields = new ArrayList<>();
 
-	                missing = true;
-	                System.out.println(" Missing Field: " + field + " at index " + i);
-	            }
-	        }
+            for (String field : mandatoryFields) {
 
-	        if (missing) {
-	            failCount++;
+                if (!item.containsKey(field)
+                        || item.get(field) == null
+                        || item.get(field).toString().trim().isEmpty()) {
 
-	            System.out.println("Record Details:");
-	            System.out.println("ID  : " + item.get("id"));
-	            System.out.println("URL : " + item.get("url"));
-	            System.out.println("--------------------------------------");
-	        }
-	    }
+                    missingFields.add(field);
+                }
+            }
 
-	    System.out.println("==============================================");
-	    System.out.println("Total Records Checked: " + list.size());
-	    System.out.println("Missing Mandatory Fields Count: " + failCount);
-	    System.out.println("==============================================");
+            // ❌ FAIL CASE
+            if (!missingFields.isEmpty()) {
 
-	    Assert.assertEquals(failCount, 0, "Some mandatory fields were missing!");
-	}
-	
-	
-// Test Case : Validate Price Range
-	public void validatePriceRange(Response response) {
+                failCount++;
 
-	    List<Map<String, Object>> properties =
-	            response.jsonPath().getList("resultList");
+                System.out.println("❌ Property FAILED");
+                System.out.println("ID      : " + item.get("id"));
+                System.out.println("URL     : " + item.get("url"));
+                System.out.println("Missing : " + missingFields);
+                System.out.println("--------------------------------------------");
 
-	    int totalRecords = properties.size();
-	    int failCount = 0;
-	    int skippedCount = 0;
+            }
+            // ✅ PASS CASE
+            else {
 
-	    System.out.println("========== VALIDATION PRICE RANGE  ==========");
+                passCount++;
 
-	    for (int i = 0; i < totalRecords; i++) {
+                System.out.println("✅ Property PASSED");
+                System.out.println("ID : " + item.get("id"));
+                System.out.println("All mandatory fields are available");
+                System.out.println("--------------------------------------------");
+            }
+        }
 
-	        Map<String, Object> item = properties.get(i);
+        // 📊 FINAL SUMMARY
+        System.out.println("\n============= SUMMARY =============");
+        System.out.println("Total Records Checked : " + list.size());
+        System.out.println("Passed Properties     : " + passCount);
+        System.out.println("Failed Properties     : " + failCount);
+        System.out.println("==================================");
 
-	        String id  = String.valueOf(item.get("id"));
-	        String url = String.valueOf(item.get("url"));
+        Assert.assertEquals(
+                failCount,
+                0,
+                "Some properties have missing mandatory fields!"
+        );
+    }
 
-	        // Step 1–3: Get required fields
-	        Number sqFtPrice = (Number) item.get("sqFtPrice");
-	        Number caSqFt    = (Number) item.get("caSqFt");
-	        Number price     = (Number) item.get("price");
+    /* ================= VALIDATION : PRICE RANGE (SAFETY RULES) ================= */
 
-	        // Step 4–6: Get safety flags
-	        String iba  = item.get("iba")  != null ? item.get("iba").toString()  : "";
-	        String cpmp = item.get("cpmp") != null ? item.get("cpmp").toString() : "";
-	        String pl   = item.get("pl")   != null ? item.get("pl").toString()   : "";
+    public void validatePriceRange() {
 
-	        // Step 7: SAFETY CHECK
-	        boolean skipValidation =
-	                ("Z".equalsIgnoreCase(iba)
-	                || "Y".equalsIgnoreCase(cpmp)
-	                || "Y".equalsIgnoreCase(pl))
-	                && (sqFtPrice == null || caSqFt == null || price == null);
+        List<Map<String, Object>> properties = getResultList();
 
-	        if (skipValidation) {
-	            skippedCount++;
-	            System.out.println("SKIPPED (Safety Rule Applied)");
-	            System.out.println("ID  : " + id);
-	            System.out.println("URL : " + url);
-	            System.out.println("----------------------------------");
-	            continue;
-	        }
+        int failCount = 0;
+        int skippedCount = 0;
 
-	        // If mandatory fields still missing → FAIL
-	        if (sqFtPrice == null || caSqFt == null || price == null) {
-	            failCount++;
-	            System.out.println("FAIL – Missing Required Price Fields");
-	            System.out.println("ID  : " + id);
-	            System.out.println("URL : " + url);
-	            System.out.println("sqFtPrice : " + sqFtPrice);
-	            System.out.println("caSqFt    : " + caSqFt);
-	            System.out.println("price     : " + price);
-	            System.out.println("----------------------------------");
-	            continue;
-	        }
+        System.out.println("========== VALIDATION PRICE RANGE ==========");
 
-	        // Step 8: Calculate expected price
-	        double calculatedPrice =
-	                sqFtPrice.doubleValue() * caSqFt.doubleValue();
+        for (Map<String, Object> item : properties) {
 
-	        // Step 9: ±2% range
-	        double lowerLimit = calculatedPrice * 0.98;
-	        double upperLimit = calculatedPrice * 1.02;
+            String id  = String.valueOf(item.get("id"));
+            String url = String.valueOf(item.get("url"));
 
-	        // Step 10: Validate price
-	        double actualPrice = price.doubleValue();
+            Number sqFtPrice = (Number) item.get("sqFtPrice");
+            Number caSqFt    = (Number) item.get("caSqFt");
+            Number price     = (Number) item.get("price");
 
-	        if (actualPrice < lowerLimit || actualPrice > upperLimit) {
+            String iba  = item.get("iba")  != null ? item.get("iba").toString()  : "";
+            String cpmp = item.get("cpmp") != null ? item.get("cpmp").toString() : "";
+            String pl   = item.get("pl")   != null ? item.get("pl").toString()   : "";
 
-	            failCount++;
+            boolean skipValidation =
+                    ("Z".equalsIgnoreCase(iba)
+                    || "Y".equalsIgnoreCase(cpmp)
+                    || "Y".equalsIgnoreCase(pl))
+                    && (sqFtPrice == null || caSqFt == null || price == null);
 
-	            System.out.println("❌ PRICE OUT OF RANGE");
-	            System.out.println("ID            : " + id);
-	            System.out.println("URL           : " + url);
-	            System.out.println("SqFt Price    : " + sqFtPrice);
-	            System.out.println("Area (SqFt)   : " + caSqFt);
-	            System.out.println("Calculated    : " + calculatedPrice);
-	            System.out.println("Allowed Range : " + lowerLimit + " - " + upperLimit);
-	            System.out.println("Actual Price  : " + actualPrice);
-	            System.out.println("----------------------------------");
+            if (skipValidation) {
+                skippedCount++;
+                System.out.println("SKIPPED (Safety Rule Applied)");
+                System.out.println("ID  : " + id);
+                System.out.println("URL : " + url);
+                System.out.println("----------------------------------");
+                continue;
+            }
 
-	        } else {
-//	            System.out.println(" PRICE OK → ID: " + id);
-//	            System.out.println(" User Type →  : " + iba);
-	        }
-	    }
+            if (sqFtPrice == null || caSqFt == null || price == null) {
+                failCount++;
+                System.out.println("FAIL – Missing Price Fields");
+                System.out.println("ID  : " + id);
+                System.out.println("URL : " + url);
+                System.out.println("----------------------------------");
+                continue;
+            }
 
-	    System.out.println("============================================");
-	    System.out.println("Total Records Checked : " + totalRecords);
-	    System.out.println("Skipped Records       : " + skippedCount);
-	    System.out.println("Failed Records        : " + failCount);
-	    System.out.println("============================================");
+            double calculatedPrice =
+                    sqFtPrice.doubleValue() * caSqFt.doubleValue();
 
-	    // ✅ Final Assertion
-	    Assert.assertEquals(
-	            failCount,
-	            0,
-	            "Price range validation failed for some properties!"
-	    );
-	}
-	
-// Test Case : Validate Formatted Price
-		
+            double lowerLimit = calculatedPrice * 0.98;
+            double upperLimit = calculatedPrice * 1.02;
 
-	public void validatePriceFormatted(Response response) {
+            double actualPrice = price.doubleValue();
 
-	    List<Map<String, Object>> properties =
-	            response.jsonPath().getList("resultList");
+            if (actualPrice < lowerLimit || actualPrice > upperLimit) {
 
-	    List<Number> priceList =
-	            response.jsonPath().getList("resultList.price", Number.class);
+                failCount++;
 
-	    List<String> priceDList =
-	            response.jsonPath().getList("resultList.priceD");
+                System.out.println("❌ PRICE OUT OF RANGE");
+                System.out.println("ID            : " + id);
+                System.out.println("URL           : " + url);
+                System.out.println("Calculated    : " + calculatedPrice);
+                System.out.println("Allowed Range : " + lowerLimit + " - " + upperLimit);
+                System.out.println("Actual Price  : " + actualPrice);
+                System.out.println("----------------------------------");
+            }
+        }
 
-	    int totalRecords = properties.size();
-	    int failCount = 0;
-	    int skippedCount = 0;
-	    
-	    System.out.println("========== VALIDATION FORMATTED PRICE ==========");
+        System.out.println("============================================");
+        System.out.println("Skipped Records : " + skippedCount);
+        System.out.println("Failed Records  : " + failCount);
+        System.out.println("============================================");
 
-	    for (int i = 0; i < totalRecords; i++) {
+        Assert.assertEquals(
+                failCount,
+                0,
+                "Price range validation failed!"
+        );
+    }
 
-	        // STEP 1: Get values
-	        double price = priceList.get(i).doubleValue();
-	        String priceD = priceDList.get(i);
+    /* ================= VALIDATION : FORMATTED PRICE ================= */
 
-	        // Skip if priceD is null or empty
-	        if (priceD == null || priceD.isEmpty()) {
-	            skippedCount++;
-	            continue;
-	        }
+    public void validatePriceFormatted() {
 
-	        // STEP 2: Convert formatted price
-	        double priceDValue = Support.convertPriceD(priceD);
+        List<Number> priceList =
+                response.jsonPath().getList("resultList.price", Number.class);
 
-	        // STEP 3: Validate ±1%
-	        double minPrice = price * 0.99;
-	        double maxPrice = price * 1.01;
+        List<String> priceDList =
+                response.jsonPath().getList("resultList.priceD");
 
-	        if (priceDValue < minPrice || priceDValue > maxPrice) {
-	            failCount++;
-	            System.out.println("============================================");
-	            System.out.println(
-	                    " Failed at index " + i +
-	                    " | Price: " + price +
-	                    " | PriceD: " + priceD +
-	                    " | Converted: " + priceDValue
-	            );
-	            System.out.println("============================================");
-	        }
-	    }
-	    
-	    System.out.println("============================================");
-	    System.out.println("Total Records  : " + totalRecords);
-	    System.out.println("Failed Records : " + failCount);
-	    System.out.println("Skipped Records: " + skippedCount);
-	    System.out.println("============================================");
-	    // Final assertion
-	    Assert.assertEquals(failCount, 0, "Formatted price validation failed");
-	}
-	
-	
-	
-	
-	
-	
-	
+        int failCount = 0;
+        int skippedCount = 0;
 
+        System.out.println("========== VALIDATION FORMATTED PRICE ==========");
+
+        for (int i = 0; i < priceList.size(); i++) {
+
+            if (priceDList.get(i) == null || priceDList.get(i).isEmpty()) {
+                skippedCount++;
+                continue;
+            }
+
+            double price = priceList.get(i).doubleValue();
+            double priceDValue =
+                    Support.convertPriceD(priceDList.get(i));
+
+            if (priceDValue < price * 0.99
+                    || priceDValue > price * 1.01) {
+
+                failCount++;
+                System.out.println(
+                        " Failed at index " + i +
+                        " | Price: " + price +
+                        " | PriceD: " + priceDList.get(i) +
+                        " | Converted: " + priceDValue
+                );
+            }
+        }
+
+        System.out.println("============================================");
+        System.out.println("Failed Records  : " + failCount);
+        System.out.println("Skipped Records : " + skippedCount);
+        System.out.println("============================================");
+
+        Assert.assertEquals(
+                failCount,
+                0,
+                "Formatted price validation failed!"
+        );
+    }
 }

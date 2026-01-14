@@ -5,12 +5,8 @@
     <classes>
       <class name="tests.test">
         <methods>
-          <include name="testMandatoryFieldsValidation"/>
-          <include name="propertySearchAPIPropertiesPrice"/>
-          <include name="validatePriceCalculationTest"/>
-          <include name="verifyPropertySearchAPIStatus"/>
+          <include name="validateMandatoryFields" invocation-numbers="0"/>
           <include name="setup"/>
-          <include name="propertySearchAPIPropertiesURL"/>
         </methods>
       </class> <!-- tests.test -->
     </classes>
