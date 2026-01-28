@@ -2,6 +2,7 @@ package tests;
 
 import java.util.Map;
 
+
 import org.testng.annotations.Test;
 
 import Pages.search;
@@ -61,4 +62,69 @@ public class test extends Base {
 
         src.validatePriceFormatted();
     }
+    
+    
+    @Test(
+    	    priority = 5,
+    	    dataProvider = "searchPayloadData",
+    	    dataProviderClass = SearchDataProvider.class
+    	)
+    	public void validateUserType(Map<String, String> excelData) {
+
+    	    search src = new search(null);
+
+    	    // API call (no Response assignment)
+    	    src.getPropertySearchAPIResponse(excelData);
+
+    	    String userType = excelData.get("inputListings");
+
+    	    if (userType == null || userType.trim().isEmpty()) {
+    	        System.out.println("User type not provided in test data. Skipping validation.");
+    	        return;
+    	    }
+
+    	    src.validateUserTypeAccordingToSearch(userType);
+    	}
+    
+    
+    @Test(
+    	    priority = 6,
+    	    dataProvider = "searchPayloadData",
+    	    dataProviderClass = SearchDataProvider.class
+    	)
+    	public void validatePropertyType(Map<String, String> excelData) {
+
+    	    search src = new search(null);
+
+    	    // API Call
+    	    src.getPropertySearchAPIResponse(excelData);
+
+    	    String propertyType = excelData.get("propertyType");
+
+    	    if (propertyType == null || propertyType.trim().isEmpty()) {
+    	        System.out.println("Property type not provided in test data. Skipping validation.");
+    	        return;
+    	    }
+
+    	    src.validatePropertyTypeAccordingToSearch(propertyType);
+    	}
+    
+    
+    
+    // Validate Property type
+    
+    
+    
+    // Validate Developer Info
+    // Validate Contact Details
+    // Validate BHK Dispaly
+    // Validate Poss.date
+    
+    
+    
+    
+    
+    
+    
+    
 }

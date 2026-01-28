@@ -23,6 +23,7 @@ public class APIUtils {
 
         // Perform API call without logging all details
         return given()
+        		//.log().all()
                 .queryParams(params) // send params
             .when()
                 .get(path)
@@ -31,18 +32,5 @@ public class APIUtils {
                 .response();
     }
 }
-//public class APIUtils {
-//
-//	public static Response get(String path, Map<String, ?> params) {
-//        return given()
-//                .log().all()
-//                .queryParams(params)
-//             .when()
-//                .get("/mbsrp/propertySearch.html")
-//                .then()
-//                .extract()
-//                .response();
-//    }
-//}
 
  

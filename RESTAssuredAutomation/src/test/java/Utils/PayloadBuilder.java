@@ -5,7 +5,9 @@ import java.util.Map;
 
 public class PayloadBuilder {
 
-	 // 🔧 Utility to clean numeric values like 1000000.0 → 1000000
+    /* ================= UTILITY METHODS ================= */
+
+    // 🔧 Clean numeric values like 1000000.0 → 1000000
     private static String cleanNumber(String value) {
         if (value == null) return null;
 
@@ -15,11 +17,19 @@ public class PayloadBuilder {
         return value;
     }
 
+    // 🔧 Clean comma-separated values: "10002, 10003" → "10002,10003"
+    private static String cleanCommaSeparated(String value) {
+        if (value == null) return null;
+        return value.replaceAll("\\s+", "");
+    }
+
+    /* ================= PAYLOAD BUILDER ================= */
+
     public static Map<String, Object> buildPayload(Map<String, String> excelData) {
 
         Map<String, Object> payload = new HashMap<>();
 
-        // 🔥 Fixed mandatory params
+        /* 🔥 FIXED MANDATORY PARAMS */
         payload.put("editSearch", "Y");
         payload.put("page", 1);
         payload.put("sortBy", "premiumRecent");
@@ -27,20 +37,35 @@ public class PayloadBuilder {
         payload.put("isNRI", "N");
         payload.put("multiLang", "en");
 
-        // 🔥 Dynamic params (cleaned)
+        /* 🔥 DYNAMIC PARAMS (CLEANED) */
+
         payload.put("category", excelData.get("category"));
-        payload.put("propertyType", cleanNumber(excelData.get("propertyType")));
-        payload.put("budgetMin", cleanNumber(excelData.get("budgetMin")));
-        payload.put("budgetMax", cleanNumber(excelData.get("budgetMax")));
-        payload.put("bedrooms", cleanNumber(excelData.get("bedrooms")));
         payload.put("city", cleanNumber(excelData.get("city")));
         payload.put("inputListings", excelData.get("inputListings"));
-        payload.put("pType", cleanNumber(excelData.get("pType")));
+        payload.put("showCnt", cleanNumber(excelData.get("showCnt")));
+
+        payload.put("budgetMin", cleanNumber(excelData.get("budgetMin")));
+        payload.put("budgetMax", cleanNumber(excelData.get("budgetMax")));
+
+        payload.put(
+            "bedrooms",
+            cleanCommaSeparated(cleanNumber(excelData.get("bedrooms")))
+        );
+
+        //payload.put("propertyType", cleanCommaSeparated(cleanNumber(excelData.get("propertyType"))));
+
+       
+
+        // DO NOT SEND pType
+         payload.put("pType", cleanCommaSeparated(cleanNumber(excelData.get("pType"))));
+
+        /* DEBUG (keep for now, remove later) */
+        //System.out.println("FINAL PAYLOAD => " + payload);
 
         return payload;
     }
-	
 }
+
 
 
 
