@@ -5,7 +5,7 @@
     <classes>
       <class name="tests.test">
         <methods>
-          <include name="printPropertyIds" invocation-numbers="0 1"/>
+          <include name="validatePropertyType" invocation-numbers="0 1 2"/>
           <include name="setup"/>
         </methods>
       </class> <!-- tests.test -->
